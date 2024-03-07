@@ -11,20 +11,19 @@ const getClients = async (req, res) => {
 };
 
 const createClient = async (req, res) => {
-  const { name, email, cpf, phone, coordinate_x, coordinate_y } = req.body;
+  const { nome, email, telefone, coordenada_x, coordenada_y } = req.body;
   try {
     const result = await services.createClient(
-      name,
+      nome,
       email,
-      cpf,
-      phone,
-      coordinate_x,
-      coordinate_y
+      telefone,
+      coordenada_x,
+      coordenada_y
     );
     res.json(result);
   } catch (err) {
     console.error('Erro ao inserir no banco de dados', err);
-    res.status(500).json({ error: 'Erro ao inserir no banco de dados' });
+    res.status(500).json({ error: err.message });
   }
 };
 
