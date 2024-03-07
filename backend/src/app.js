@@ -3,8 +3,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const client = require('./database/connection');
 const router = require('./routes/routes');
+const cors = require('cors');
 
 app.use(express.json());
+app.use(cors());
 
 client.connect((err) => {
   if (err) {
@@ -17,5 +19,4 @@ client.connect((err) => {
   });
 });
 
-app.use('/', router);
-
+app.use('/clients', router);
