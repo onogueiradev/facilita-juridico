@@ -10,23 +10,16 @@ const getClients = async () => {
   }
 };
 
-const createClient = async (
-  name,
-  email,
-  cpf,
-  phone,
-  coordinate_x,
-  coordinate_y
-) => {
+const createClient = async (name, email, phone, coordinate_x, coordinate_y) => {
   try {
     const result = await client.query(
-      'INSERT INTO clientes (nome, email, cpf, telefone, coordenada_x, coordenada_y) VALUES ($1, $2, $3, $4, $5, $6)',
-      [name, email, cpf, phone, coordinate_x, coordinate_y]
+      'INSERT INTO clientes (nome, email, telefone, coordenada_x, coordenada_y) VALUES ($1, $2, $3, $4, $5)',
+      [name, email, phone, coordinate_x, coordinate_y]
     );
     return result;
   } catch (err) {
     console.error('Erro ao inserir no banco de dados', err);
-    return { error: 'Erro ao inserir no banco de dados' };
+    return { error: err.message };
   }
 };
 
