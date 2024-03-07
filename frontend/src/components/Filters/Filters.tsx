@@ -17,8 +17,8 @@ export function Filters() {
   const [cordinateY, setCordinateY] = useState('');
   const [noResults, setNoResults] = useState(false);
 
-  const cordinatesX = Array.from(new Set(rowsInitial.map((row) => row.coordenada_x)));
-  const cordinatesY = Array.from(new Set(rowsInitial.map((row) => row.coordenada_y)));
+  const cordinatesX = Array.from(new Set(rowsInitial.map((row) => row.coordenada_x).sort((a, b) => a - b)));
+  const cordinatesY = Array.from(new Set(rowsInitial.map((row) => row.coordenada_y).sort((a, b) => a - b)));
 
   function removeAccentsAndSpecialChars(str: string) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9 ]/g, '');
