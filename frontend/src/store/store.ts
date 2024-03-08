@@ -18,6 +18,8 @@ type Store = {
   setMessageAlertClient: (messageAlertClient: string) => void;
   actionError: boolean;
   setActionError: (actionError: boolean) => void;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -37,4 +39,6 @@ export const useStore = create<Store>((set) => ({
   setMessageAlertClient: (messageAlertClient) => set({ messageAlertClient }),
   actionError: false,
   setActionError: (actionError) => set({ actionError }),
+  isLoading: true,
+  setIsLoading: (isLoading) => set({ isLoading }),
 }));
