@@ -14,7 +14,7 @@ type Props = {
 }
 
 export function FormsClient({ open, onClose }: Props) {
-  const { setRowsInitial, isEditing, dataEdit, setIsEditing, setDataEdit, setActionSuccess, setMessageAlertClient, setNewRows } = useStore();
+  const { setRowsInitial, isEditing, dataEdit, setIsEditing, setDataEdit, setActionSuccess, setMessageAlertClient, setNewRows, setIsLoading } = useStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -87,7 +87,7 @@ export function FormsClient({ open, onClose }: Props) {
   };
   const handleSubmit = async () => {
     const fields = ['name', 'email', 'phone', 'cordinateX', 'cordinateY'];
-
+    setIsLoading(true);
     for (const field of fields) {
       const isValid = validateField(field, eval(field));
       if (!isValid) {
@@ -103,28 +103,34 @@ export function FormsClient({ open, onClose }: Props) {
       coordenada_y: Number(cordinateY),
     };
 
-    const saveClient = await fetchData('clients', isEditing ? 'PUT' : 'POST', isEditing ? { ...data, id: dataEdit?.id } : data)
+    try {
+      const saveClient = await fetchData('clients', isEditing ? 'PUT' : 'POST', isEditing ? { ...data, id: dataEdit?.id } : data)
 
-    if (saveClient.error?.includes('duplicate key value violates unique constraint "clientes_email_key"')) {
-      showAlert(mappingMessagesAlert.emailDuplicate, 'error');
-      return;
-    }
+      if (saveClient.error?.includes('duplicate key value violates unique constraint "clientes_email_key"')) {
+        showAlert(mappingMessagesAlert.emailDuplicate, 'error');
+        return;
+      }
 
-    if (saveClient) {
-      showAlert(isEditing ? mappingMessagesAlert.successEdit : mappingMessagesAlert.success, 'success');
-      const data = await fetchData();
-      setRowsInitial(data);
-      setNewRows([]);
-      setIsEditing(false);
-      setDataEdit(null);
-      setActionSuccess(true);
-      setMessageAlertClient(isEditing ? mappingMessagesAlert.successEdit : mappingMessagesAlert.success);
+      if (saveClient) {
+        showAlert(isEditing ? mappingMessagesAlert.successEdit : mappingMessagesAlert.success, 'success');
+        const data = await fetchData();
+        setRowsInitial(data);
+        setNewRows([]);
+        setIsEditing(false);
+        setDataEdit(null);
+        setActionSuccess(true);
+        setMessageAlertClient(isEditing ? mappingMessagesAlert.successEdit : mappingMessagesAlert.success);
 
-      setTimeout(() => {
-        setActionSuccess(false);
-        setMessageAlertClient('');
-      }, 5000)
-      handleClearFields();
+        setTimeout(() => {
+          setActionSuccess(false);
+          setMessageAlertClient('');
+        }, 5000)
+        handleClearFields();
+      }
+    } catch (error) {
+      console.error('Erro ao salvar cliente', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
