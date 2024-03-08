@@ -1,5 +1,7 @@
 import React from 'react';
-import { Grid, InputLabel, TextField } from '@mui/material';
+import { Grid, InputLabel, TextField, Skeleton } from '@mui/material';
+
+import { useStore } from '@/store/store';
 
 type Props = {
   label: string;
@@ -11,23 +13,29 @@ type Props = {
 }
 
 export function InputComponent({ label, value, onChange, placeholder, sm = 4, type = 'text' }: Props) {
+  const { isLoading } = useStore();
   return (
     <Grid item xs={12} sm={sm}>
-      <InputLabel>{label}</InputLabel>
-      <TextField
-        size='small'
-        type={type}
-        inputProps={{
-          autocomplete: 'new-password',
-          form: {
-            autocomplete: 'off',
-          },
-        }}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        fullWidth
-        placeholder={placeholder}
-      />
+      {isLoading
+        ? <Skeleton variant="text" className='w-full' height={70} /> :
+        <>
+          <InputLabel>{label}</InputLabel>
+          <TextField
+            size='small'
+            type={type}
+            inputProps={{
+              autoComplete: 'new-password',
+              form: {
+                autoComplete: 'off',
+              },
+            }}
+            value={value ?? ''}
+            onChange={(e) => onChange(e.target.value)}
+            fullWidth
+            placeholder={placeholder}
+          />
+        </>
+      }
     </Grid>
   );
 };
