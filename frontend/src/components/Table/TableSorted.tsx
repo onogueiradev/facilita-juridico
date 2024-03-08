@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Toolbar, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Toolbar, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, Skeleton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import TrashIcon from '@mui/icons-material/Delete';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
@@ -71,7 +71,7 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 }
 
 export function TableSorted() {
-  const { rowsInitial, newRows, setDataEdit, setIsEditing, setOpenDialog, setRowsInitial, messageAlertClient, setMessageAlertClient, actionSuccess, setActionSuccess, actionError } = useStore();
+  const { rowsInitial, newRows, setDataEdit, setIsEditing, setOpenDialog, setRowsInitial, messageAlertClient, setMessageAlertClient, actionSuccess, setActionSuccess, actionError, isLoading, setIsLoading, setNewRows } = useStore();
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataClient>('nome');
@@ -106,12 +106,14 @@ export function TableSorted() {
     setOpen(false);
   };
   const handleDeleteClient = async () => {
+    setIsLoading(true);
     try {
       const id = clientDelete?.id;
       await fetchData(`clients/${id}`, 'DELETE');
       setOpen(false);
       const response = await fetchData('clients');
       setRowsInitial(response);
+      setNewRows([]);
       setActionSuccess(true);
       setMessageAlertClient('Cliente excluído com sucesso!');
 
@@ -121,10 +123,12 @@ export function TableSorted() {
       }, 5000);
     } catch (error) {
       console.error('Erro ao deletar cliente', error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -177,7 +181,7 @@ export function TableSorted() {
         <Toolbar>
           <Filters />
         </Toolbar>
-        {(actionSuccess || actionError )&& (
+        {(actionSuccess || actionError) && (
           <Alert icon={actionError ? <CancelIcon fontSize="inherit" /> : <CheckCircleOutline fontSize="inherit" />} severity={actionError ? 'error' : 'success'} className='flex items-center justify-center text-center text-base'>
             {messageAlertClient}
           </Alert>
@@ -208,20 +212,28 @@ export function TableSorted() {
                       component="th"
                       id={labelId}
                       scope="row"
-                    >
-                      {row.nome}
+                    >{isLoading ? <Skeleton className="w-full" height={20} /> : row.nome}
                     </TableCell>
-                    <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.telefone}</TableCell>
-                    <TableCell align="left">{row.coordenada_x}</TableCell>
-                    <TableCell align="left">{row.coordenada_y}</TableCell>
+                    <TableCell align="left">
+                      {isLoading ? <Skeleton className="w-full" height={20} /> : row.email}
+                    </TableCell>
+                    <TableCell align="left">{isLoading ? <Skeleton className="w-full" height={20} /> : row.telefone
+                    }</TableCell>
+                    <TableCell align="left">{isLoading ? <Skeleton className="w-full" height={20} /> : row.coordenada_x
+                    }</TableCell>
+                    <TableCell align="left">{isLoading ? <Skeleton className="w-full" height={20} /> : row.coordenada_y
+                    }</TableCell>
                     <TableCell align="left" className='flex items-center'>
-                      <TooltipComponent title="Editar" placement="top" onClick={() => handleEditClient(row)}>
-                        <EditIcon className="text-gray-400 hover:text-gray-600 transition-all" />
-                      </TooltipComponent>
-                      <TooltipComponent title="Excluir" placement="top" onClick={() => handleClickOpen(row)}>
-                        <TrashIcon className="text-red-300 hover:text-red-500 transition-all" />
-                      </TooltipComponent>
+                      {isLoading ? <Skeleton className="w-24" height={20} /> :
+                        <>
+                          <TooltipComponent title="Editar" placement="top" onClick={() => handleEditClient(row)}>
+                            <EditIcon className="text-gray-400 hover:text-gray-600 transition-all" />
+                          </TooltipComponent>
+                          <TooltipComponent title="Excluir" placement="top" onClick={() => handleClickOpen(row)}>
+                            <TrashIcon className="text-red-300 hover:text-red-500 transition-all" />
+                          </TooltipComponent>
+                        </>
+                      }
                     </TableCell>
                   </TableRow>
                 );
@@ -229,21 +241,24 @@ export function TableSorted() {
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          labelRowsPerPage="Linhas por página"
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          labelDisplayedRows={({ from, to, count }) => {
-            return `${from}–${to} de ${count !== -1 ? count : `mais de ${to}`}`;
-          }}
-          className='bg-gray-200 flex items-center justify-center'
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-
+        {isLoading ? (
+          <Skeleton variant="rectangular" className='w-full' height={80} />
+        ) : (
+          <TablePagination
+            labelRowsPerPage="Linhas por página"
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            labelDisplayedRows={({ from, to, count }) => {
+              return `${from}–${to} de ${count !== -1 ? count : `mais de ${to}`}`;
+            }}
+            className='bg-gray-200 flex items-center justify-center'
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        )}
       </Paper>
     </Box>
   );
