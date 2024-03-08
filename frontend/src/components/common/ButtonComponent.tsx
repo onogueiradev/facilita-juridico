@@ -1,5 +1,8 @@
 import React from 'react';
 import Button from '@mui/material/Button';
+import { Skeleton } from '@mui/material';
+
+import { useStore } from '@/store/store';
 
 type Props = {
   onClick: () => void;
@@ -8,13 +11,16 @@ type Props = {
 }
 
 export function ButtonComponent({ onClick, children, className = 'text-gray-600 hover:bg-indigo-500 hover:text-white' }: Props) {
+  const { isLoading } = useStore();
   return (
-    <Button
-      variant="contained"
-      className={className}
-      onClick={onClick}
-    >
-      {children}
-    </Button>
+    isLoading
+      ? <Skeleton variant="text" className='w-28' height={70} />
+      : <Button
+        variant="contained"
+        className={className}
+        onClick={onClick}
+      >
+        {children}
+      </Button>
   );
 }
