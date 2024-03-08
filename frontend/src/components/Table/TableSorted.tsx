@@ -1,12 +1,19 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Toolbar, Paper, Tooltip } from '@mui/material';
-import { Visibility } from '@mui/icons-material';
+import { Box, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Toolbar, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import TrashIcon from '@mui/icons-material/Delete';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { CheckCircleOutline } from '@mui/icons-material';
 
 import { Filters } from '../Filters/Filters';
 import { EnhancedTableHead } from './EnhancedTableHead';
+import { ButtonComponent, TooltipComponent } from '../common';
 
 import { useStore } from '@/store/store';
+import { fetchData } from '@/services';
 import { DataClient } from '@/interfaces/DataClient';
 
 function createData(
@@ -64,17 +71,19 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 }
 
 export function TableSorted() {
-  const { rowsInitial, newRows } = useStore();
+  const { rowsInitial, newRows, setDataEdit, setIsEditing, setOpenDialog, setRowsInitial, messageAlertClient, setMessageAlertClient, actionSuccess, setActionSuccess, actionError } = useStore();
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataClient>('nome');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [clientDelete, setClientDelete] = useState<DataClient>();
+  const [open, setOpen] = useState(false);
 
   const rows = (newRows.length > 0 ? newRows : rowsInitial)?.map((row) => createData(row.id || 0, row.nome, row.email, row.telefone, row.coordenada_x, row.coordenada_y));
 
   const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
+    _event: React.MouseEvent<unknown>,
     property: keyof DataClient,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -82,9 +91,38 @@ export function TableSorted() {
     setOrderBy(property);
   };
 
-  const handleClickView = (event: React.MouseEvent<unknown>, id: number) => {
-    // console.log(id, 'id')
+  const handleEditClient = (client: DataClient) => {
+    setDataEdit(client);
+    setIsEditing(true);
+    setOpenDialog(true);
   };
+
+  const handleClickOpen = (client: DataClient) => {
+    setOpen(true);
+    setClientDelete(client);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleDeleteClient = async () => {
+    try {
+      const id = clientDelete?.id;
+      await fetchData(`clients/${id}`, 'DELETE');
+      setOpen(false);
+      const response = await fetchData('clients');
+      setRowsInitial(response);
+      setActionSuccess(true);
+      setMessageAlertClient('Cliente excluído com sucesso!');
+
+      setTimeout(() => {
+        setActionSuccess(false);
+        setMessageAlertClient('');
+      }, 5000);
+    } catch (error) {
+      console.error('Erro ao deletar cliente', error);
+    }
+  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -105,11 +143,45 @@ export function TableSorted() {
   );
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '90%', margin: 'auto', mb: 2 }}>
+    <Box sx={{ width: '100%', }}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" className='text-center'>
+          {`Deseja realmente esse cliente?`}
+        </DialogTitle>
+        <DialogContent className='p-0 bg-gray-200 !py-2'>
+          <DialogContentText id="alert-dialog-description" className='flex items-center justify-center gap-3 text-lg '>
+            <AccountCircleIcon className='text-5xl text-gray-500' />
+            {`Cliente: ${clientDelete?.nome}`} <br />
+            {`Email: ${clientDelete?.email}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" className='flex items-center justify-center gap-3 text-lg'>
+            <ReportProblemIcon className='text-yellow-500' fontSize="large" />
+            Esta ação não poderá ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions className='flex items-center justify-center'>
+          <ButtonComponent className='bg-indigo-500 hover:bg-indigo-700 text-white' onClick={handleClose}>Cancelar</ButtonComponent>
+          <ButtonComponent className='bg-red-500 hover:bg-red-700 text-white' onClick={handleDeleteClient}>
+            Excluir
+          </ButtonComponent>
+        </DialogActions>
+      </Dialog>
+      <Paper sx={{ width: '95%', margin: 'auto', mb: 2, height: '100%' }}>
         <Toolbar>
           <Filters />
         </Toolbar>
+        {(actionSuccess || actionError )&& (
+          <Alert icon={actionError ? <CancelIcon fontSize="inherit" /> : <CheckCircleOutline fontSize="inherit" />} severity={actionError ? 'error' : 'success'} className='flex items-center justify-center text-center text-base'>
+            {messageAlertClient}
+          </Alert>
+        )}
         <TableContainer sx={{ width: '100%', margin: 'auto' }}>
           <Table
             sx={{ minWidth: 750 }}
@@ -119,7 +191,7 @@ export function TableSorted() {
             <EnhancedTableHead
               order={order}
               orderBy={orderBy}
-              onRequestSort={handleRequestSort}
+              onRequestSort={(e, property) => handleRequestSort(e, property)}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
@@ -143,10 +215,13 @@ export function TableSorted() {
                     <TableCell align="left">{row.telefone}</TableCell>
                     <TableCell align="left">{row.coordenada_x}</TableCell>
                     <TableCell align="left">{row.coordenada_y}</TableCell>
-                    <TableCell align="left">
-                      <Tooltip title="Ver Detalhes" onClick={(event) => handleClickView(event, row.id || 0)}>
-                        <Visibility className="text-gray-400" />
-                      </Tooltip>
+                    <TableCell align="left" className='flex items-center'>
+                      <TooltipComponent title="Editar" placement="top" onClick={() => handleEditClient(row)}>
+                        <EditIcon className="text-gray-400 hover:text-gray-600 transition-all" />
+                      </TooltipComponent>
+                      <TooltipComponent title="Excluir" placement="top" onClick={() => handleClickOpen(row)}>
+                        <TrashIcon className="text-red-300 hover:text-red-500 transition-all" />
+                      </TooltipComponent>
                     </TableCell>
                   </TableRow>
                 );
@@ -164,9 +239,11 @@ export function TableSorted() {
           labelDisplayedRows={({ from, to, count }) => {
             return `${from}–${to} de ${count !== -1 ? count : `mais de ${to}`}`;
           }}
+          className='bg-gray-200 flex items-center justify-center'
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
       </Paper>
     </Box>
   );
