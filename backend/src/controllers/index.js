@@ -1,6 +1,5 @@
-const { getClients, createClient } = require('./clients');
+const controllers = require('./clients');
 
 module.exports = {
-  getClients,
-  createClient,
+  ...controllers,
 };
