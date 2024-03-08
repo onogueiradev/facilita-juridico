@@ -14,11 +14,10 @@ export function CoordinateSelect({ label, value, onChange, options }: Props) {
       <InputLabel id="coordinate-label">{label}</InputLabel>
       <Select
         labelId="coordinate-label"
+        size='small'
         value={value}
         onChange={(e) => onChange(e.target.value)}
         fullWidth
-        placeholder='Selecione'
-        defaultValue='Selecione'
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>{option}</MenuItem>
