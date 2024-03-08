@@ -1,7 +1,8 @@
 import { DataClient } from "@/interfaces/DataClient";
 import { HeadCell } from "@/interfaces/HeadCell";
-import { Box, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
-import { visuallyHidden } from '@mui/utils';
+import { TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
+
+import { TooltipComponent } from "../common";
 
 type Order = 'asc' | 'desc';
 
@@ -42,13 +43,19 @@ const headCells: readonly HeadCell[] = [
     numeric: true,
     disablePadding: false,
   },
+  {
+    id: 'actions',
+    label: 'Ações',
+    numeric: true,
+    disablePadding: false,
+  },
 ];
 
 export function EnhancedTableHead(props: Props) {
   const { order, orderBy, onRequestSort } =
     props;
   const createSortHandler =
-    (property: keyof DataClient) => (event: React.MouseEvent<unknown>) => {
+    (event: React.MouseEvent<unknown>, property: keyof DataClient) => {
       onRequestSort(event, property);
     };
 
@@ -65,14 +72,23 @@ export function EnhancedTableHead(props: Props) {
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+              onClick={(event) => headCell.id !== 'actions' ? createSortHandler(event, headCell.id) : ''}
             >
-              {headCell.label}
-              {orderBy === headCell.id ? (
+              {
+                headCell.id !== 'actions'
+                  ? <TooltipComponent
+                    title={`Ordenar por ${headCell.label}`}
+                    placement='top'
+                  >
+                    {headCell.label}
+                  </TooltipComponent>
+                  : headCell.label
+              }
+              {/* {headCell.id !== 'actions' && orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </Box>
-              ) : null}
+              ) : null} */}
             </TableSortLabel>
           </TableCell>
         ))}
