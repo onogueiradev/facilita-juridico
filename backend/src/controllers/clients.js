@@ -57,9 +57,21 @@ const updateClient = async (req, res) => {
   }
 };
 
+const deleteClient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await services.deleteClient(id);
+    res.json(result);
+  } catch (err) {
+    console.error('Erro ao deletar no banco de dados', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getClients,
   createClient,
   visitationOrder,
   updateClient,
+  deleteClient,
 };
