@@ -1,8 +1,10 @@
 import { DataClient } from "@/interfaces/DataClient";
 import { HeadCell } from "@/interfaces/HeadCell";
-import { TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
+import { TableCell, TableHead, TableRow, TableSortLabel, Skeleton } from "@mui/material";
 
 import { TooltipComponent } from "../common";
+
+import { useStore } from "@/store/store";
 
 type Order = 'asc' | 'desc';
 
@@ -52,12 +54,15 @@ const headCells: readonly HeadCell[] = [
 ];
 
 export function EnhancedTableHead(props: Props) {
+  const { isLoading } = useStore();
+
   const { order, orderBy, onRequestSort } =
     props;
   const createSortHandler =
     (event: React.MouseEvent<unknown>, property: keyof DataClient) => {
       onRequestSort(event, property);
     };
+
 
   return (
     <TableHead>
@@ -70,11 +75,11 @@ export function EnhancedTableHead(props: Props) {
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
-              active={orderBy === headCell.id}
+              active={isLoading ? false : orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={(event) => headCell.id !== 'actions' ? createSortHandler(event, headCell.id) : ''}
             >
-              {
+              {isLoading ? <Skeleton className="w-36" height={60} /> :
                 headCell.id !== 'actions'
                   ? <TooltipComponent
                     title={`Ordenar por ${headCell.label}`}
@@ -84,11 +89,6 @@ export function EnhancedTableHead(props: Props) {
                   </TooltipComponent>
                   : headCell.label
               }
-              {/* {headCell.id !== 'actions' && orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null} */}
             </TableSortLabel>
           </TableCell>
         ))}
