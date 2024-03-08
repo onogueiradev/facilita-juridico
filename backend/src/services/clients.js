@@ -23,7 +23,28 @@ const createClient = async (name, email, phone, coordinate_x, coordinate_y) => {
   }
 };
 
+const updateClient = async (
+  id,
+  name,
+  email,
+  phone,
+  coordinate_x,
+  coordinate_y
+) => {
+  try {
+    const result = await client.query(
+      'UPDATE clientes SET nome = $1, email = $2, telefone = $3, coordenada_x = $4, coordenada_y = $5 WHERE id = $6',
+      [name, email, phone, coordinate_x, coordinate_y, id]
+    );
+    return result;
+  } catch (err) {
+    console.error('Erro ao atualizar no banco de dados', err);
+    return { error: err.message };
+  }
+};
+
 module.exports = {
   getClients,
   createClient,
+  updateClient,
 };
