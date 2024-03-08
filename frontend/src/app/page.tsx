@@ -1,10 +1,11 @@
 'use client';
 import { useEffect } from "react";
+
 import Dashboard from "@/components/Dashboard/Dashboard";
-import { CreateClientModal } from "@/components/FormsCreateClient/FormsCreateClient";
+import { FormsClient } from "@/components/FormsClient/FormsClient";
 
 import { useStore } from "@/store/store";
-import { getApiData } from "@/services";
+import { fetchData } from "@/services";
 
 export default function Home() {
 
@@ -12,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     const request = async () => {
-      const data = await getApiData();
+      const data = await fetchData();
       setRowsInitial(data);
     }
     request();
@@ -22,9 +23,9 @@ export default function Home() {
     setOpenDialog(false);
   }
   return (
-    <main className="bg-gray-100 flex items-start h-screen w-[100vw] justify-start py-12">
+    <main className="bg-gray-100 flex items-start h-screen w-[100vw] justify-start sm:py-12 py-4">
       <Dashboard />
-      <CreateClientModal open={openDialog} onClose={handleClose} />
+      <FormsClient open={openDialog} onClose={handleClose} />
     </main>
   );
 }
