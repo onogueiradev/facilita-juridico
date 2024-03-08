@@ -35,7 +35,7 @@ export function MapComponent({ openModal, setOpenModal }: Props) {
     }
   }, [openModal, setOpenModal]);
 
-  const handleSearchByName = (clientId: number) => {
+  const handleSearchById = (clientId: number) => {
     setNewRows(rowsInitial.filter((row) => row.id === clientId));
     handleCloseModal();
   }
@@ -50,9 +50,9 @@ export function MapComponent({ openModal, setOpenModal }: Props) {
               key={index}
               title="Visualizar cliente"
               placement="left"
-              onClick={() => handleSearchByName(client.id)}
+              onClick={() => handleSearchById(client.id)}
             >
-              <ListItem key={client.id} className=" shado border-gray-200 py-2 hover:shadow-lg transition-all cursor-pointer w-full flex items-center justify-center gap-2 rounded-full hover:bg-gray-100" onClick={() => handleSearchByName(client.id)}>
+              <ListItem key={client.id} className=" shado border-gray-200 py-2 hover:shadow-lg transition-all cursor-pointer w-full flex items-center justify-center gap-2 rounded-full hover:bg-gray-100" onClick={() => handleSearchById(client.id)}>
                 <AccountCircleIcon className='text-4xl text-gray-500' />
                 <ListItemText primary={`Cliente ${client.name}`} />
               </ListItem>
