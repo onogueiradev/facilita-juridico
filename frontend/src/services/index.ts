@@ -1,31 +1,29 @@
-import { DataClientCreate } from "@/interfaces/DataClient";
+import { DataClient, DataClientCreate } from "@/interfaces/DataClient";
 
-const url = "http://localhost:3000/clients";
+const url = "http://localhost:3000";
 
-export async function getApiData() {
+export async function fetchData(endpoint: string = "clients", method: string = "GET", data?: DataClientCreate | DataClient, id?: string) {
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data", error);
-    throw error;
-  }
-}
-
-export async function createClient(data: DataClientCreate) {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
+    const requestConfig: RequestInit = {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
-    });
+    };
+
+    if (method === "DELETE" && id) {
+      endpoint += `/${id}`;
+    }
+
+    if (method !== "GET" && data) {
+      requestConfig.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${url}/${endpoint}`, requestConfig);
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    console.error("Error creating client", error);
+    console.error(`Error ${method}ing data`, error);
     throw error;
   }
 }
