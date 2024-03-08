@@ -43,8 +43,19 @@ const updateClient = async (
   }
 };
 
+const deleteClient = async (id) => {
+  try {
+    const result = await client.query('DELETE FROM clientes WHERE id = $1', [id]);
+    return result;
+  } catch (err) {
+    console.error('Erro ao deletar no banco de dados', err);
+    return { error: err.message };
+  }
+}
+
 module.exports = {
   getClients,
   createClient,
   updateClient,
+  deleteClient
 };
