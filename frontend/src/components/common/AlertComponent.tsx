@@ -1,5 +1,5 @@
-import { Alert } from '@mui/material'
 import React from 'react'
+import { Alert } from '@mui/material'
 
 type Props = {
   severity: 'success' | 'error' | 'info' | 'warning';
