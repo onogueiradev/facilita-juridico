@@ -5,8 +5,8 @@ import "./globals.css";
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Clientes do serviço de limpeza",
-  description: "Clientes do serviço de limpeza",
+  title: "Sistema de Gerenciamento de Clientes",
+  description: "Sistema de Gerenciamento de Clientes",
 };
 
 export default function RootLayout({
