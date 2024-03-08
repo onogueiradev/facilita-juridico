@@ -27,6 +27,15 @@ export function Filters() {
   }
 
   const applyFilters = useCallback(() => {
+    if (!name && !email && !phone && !cordinateX && !cordinateY) {
+      setActionError(true);
+      setMessageAlertClient('Preencha ao menos um campo para filtrar');
+      setTimeout(() => {
+        setActionError(false);
+        setMessageAlertClient('');
+      }, 5000);
+      return;
+    }
     const filteredRows = rowsInitial?.filter((row) => {
       const formattedName = removeAccentsAndSpecialChars(name.toLowerCase());
       const formattedRowName = removeAccentsAndSpecialChars(row.nome.toLowerCase());
@@ -65,6 +74,8 @@ export function Filters() {
     setCordinateY('');
     setRowsInitial(rowsInitial);
     setNewRows([])
+    setActionError(false);
+    setMessageAlertClient('');
   };
 
   const handleCreate = () => {
@@ -111,6 +122,14 @@ export function Filters() {
       options: cordinatesY,
     },
   ]
+
+  const renderButtons = [
+    { text: 'Filtrar', onClick: applyFilters, className: 'bg-indigo-500 hover:bg-indigo-700 text-white' },
+    { text: 'Limpar', onClick: resetFilters, className: 'bg-orange-500 hover:bg-orange-700 text-white' },
+    { text: 'Criar', onClick: handleCreate, className: 'bg-green-500 hover:bg-green-700 text-white' },
+    { text: 'Visitação', onClick: handleVisitation, className: 'bg-purple-500 hover:bg-purple-700 text-white' },
+  ];
+
   return (
     <Grid container spacing={2} className='p-6'>
       {renderInputs.map((input, index) => {
@@ -119,18 +138,9 @@ export function Filters() {
           : <InputComponent key={index} {...input} />
       })}
       <Grid item xs={12} sm={12} className="flex items-center justify-center space-x-4 mt-2">
-        <ButtonComponent onClick={applyFilters} className=' bg-indigo-500 hover:bg-indigo-700 text-white'>
-          Filtrar
-        </ButtonComponent>
-        <ButtonComponent onClick={resetFilters} className='bg-orange-500 hover:bg-orange-700 text-white'>
-          Limpar
-        </ButtonComponent>
-        <ButtonComponent onClick={handleCreate} className=' bg-green-500 hover:bg-green-700 text-white'>
-          Criar
-        </ButtonComponent>
-        <ButtonComponent onClick={handleVisitation} className=' bg-purple-500 hover:bg-purple-700 text-white'>
-          Visitação
-        </ButtonComponent>
+        {renderButtons.map((button, index) => {
+          return <ButtonComponent key={index} {...button}>{button.text}</ButtonComponent>
+        })}
       </Grid>
       <MapComponent openModal={openModal} setOpenModal={setOpenModal} />
     </Grid>
