@@ -23,6 +23,18 @@ Antes de começar, certifique-se de ter as seguintes ferramentas instaladas no s
 - O Docker é usado para rodar o servidor backend, banco de dados PostgreSQL e o frontend em containers. A versão recomendada é a 24.0.2 ou superior.
 - O Docker Compose é usado para gerenciar e conectar os contêineres Docker. A versão recomendada é a 2.19.1 ou superior.
 
+Você pode executar os seguintes comandos para verificar se as ferramentas estão instaladas corretamente:
+
+Versão do Docker:
+```bash
+docker --version
+```
+
+Versão do Docker Compose:
+```bash
+docker-compose --version
+```
+
 Depois de garantir que todas as ferramentas estão instaladas, siga as instruções abaixo para rodar o projeto.
 
 </details>
@@ -51,7 +63,7 @@ Depois de garantir que todas as ferramentas estão instaladas, siga as instruç�
 - Este comando iniciará o backend na porta `3000`, o banco de dados na porta `5432` e o frontend na porta `3001`
 - O script `init.sql` que se encontra em `/backend/initdb/init.sql` será executado automaticamente, preenchendo o banco com dados iniciais
 
-Quando os containers estiverem prontos, você deve visualizar isso no terminal:
+Quando os containers estiverem prontos, você verá a seguinte mensagem no terminal:
 <img src="./assets/img/containers-healthy.png" alt="Containers prontos" width="100%"/>
 
 4. Acesse o frontend em `http://localhost:3001` e o backend em `http://localhost:3000`
@@ -110,7 +122,7 @@ Base url: `http://localhost:3000`
 }
 ```
 
-### Exemplos de requisições
+### Exemplos das requisições
 
 [GET] - `http://localhost:3000/clients`
 
