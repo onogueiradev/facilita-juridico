@@ -1,24 +1,55 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/db_cleaning"
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - postgres
-
   postgres:
+    container_name: database-facilita-juridico
     image: postgres:latest
-    ports:
-      - "5432:5432"
+    restart: 'always'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db_cleaning
     volumes:
-      - ./backend:/docker-entrypoint-initdb.d
+      - ./backend/initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      timeout: 10s
+      retries: 5
+
+  backend:
+    container_name: backend-facilita-juridico
+    build: ./backend
+    restart: 'always'
+    working_dir: /app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/db_cleaning"
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    container_name: frontend-facilita-juridico
+    build:
+      context: ./frontend
+      args:
+        - NODE_ENV=production
+    restart: 'always'
+    volumes:
+      - ./frontend:/app/frontend
+    ports:
+      - 3001:3001
+    working_dir: /app/frontend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3001/health" ]
+      timeout: 10s
+      retries: 5
