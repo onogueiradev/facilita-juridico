@@ -16,6 +16,7 @@ export function ButtonComponent({ onClick, children, className = 'text-gray-600 
     isLoading
       ? <Skeleton variant="text" className='w-28' height={70} />
       : <Button
+        size='small'
         variant="contained"
         className={className}
         onClick={onClick}
