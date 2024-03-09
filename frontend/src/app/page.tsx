@@ -14,7 +14,11 @@ export default function Home() {
   useEffect(() => {
     const request = async () => {
       const data = await fetchData();
-      setRowsInitial(data);
+      if (data?.message?.includes('Nenhum cliente cadastrado')) {
+        setRowsInitial([]);
+      } else {
+        setRowsInitial(data);
+      }
       setTimeout(() => {
         setIsLoading(false);
       }, 3000)
