@@ -1,6 +1,6 @@
-FROM node:18.17.0
+FROM node:18.17.1
 
-WORKDIR /app
+WORKDIR /app/backend
 
 COPY . .
 
