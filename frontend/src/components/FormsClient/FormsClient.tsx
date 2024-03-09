@@ -42,7 +42,7 @@ export function FormsClient({ open, onClose }: Props) {
     phone: 'Por favor, preencha o campo telefone',
     cordinateX: 'Por favor, preencha o campo coordenada X',
     cordinateY: 'Por favor, preencha o campo coordenada Y',
-    success: 'Cliente criado com sucesso!',
+    success: 'Cliente cadastrado com sucesso!',
     emailDuplicate: 'Email já cadastrado. Por favor, insira um email diferente.',
     successEdit: 'Cliente editado com sucesso!',
   }
@@ -86,11 +86,12 @@ export function FormsClient({ open, onClose }: Props) {
     return isValid;
   };
   const handleSubmit = async () => {
-    const fields = ['name', 'email', 'phone', 'cordinateX', 'cordinateY'];
+    const fields = ['name', 'phone', 'email', 'cordinateX', 'cordinateY'];
     setIsLoading(true);
     for (const field of fields) {
       const isValid = validateField(field, eval(field));
       if (!isValid) {
+        setIsLoading(false);
         return;
       }
     }
@@ -104,9 +105,9 @@ export function FormsClient({ open, onClose }: Props) {
     };
 
     try {
-      const saveClient = await fetchData('clients', isEditing ? 'PUT' : 'POST', isEditing ? { ...data, id: dataEdit?.id } : data)
-
-      if (saveClient.error?.includes('duplicate key value violates unique constraint "clientes_email_key"')) {
+      const saveClient = await fetchData('clients', isEditing ? 'PUT' : 'POST', data, isEditing ? dataEdit?.id?.toString() : undefined);
+      
+      if (saveClient.error?.includes('Email já cadastrado.')) {
         showAlert(mappingMessagesAlert.emailDuplicate, 'error');
         return;
       }
