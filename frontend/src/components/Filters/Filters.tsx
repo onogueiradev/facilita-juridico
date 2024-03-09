@@ -8,7 +8,7 @@ import { MapComponent } from '../MapComponent/MapComponent';
 import { useStore } from '@/store/store';
 
 export function Filters() {
-  const { rowsInitial, setNewRows, setRowsInitial, setOpenDialog, setActionError, setMessageAlertClient } = useStore();
+  const { rowsInitial, setNewRows, setRowsInitial, setOpenDialog, setActionError, setMessageAlertClient, setActionSuccess } = useStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -74,17 +74,25 @@ export function Filters() {
     setCordinateY('');
     setRowsInitial(rowsInitial);
     setNewRows([])
-    setActionError(false);
-    setMessageAlertClient('');
+    handleResetAlert()
   };
 
   const handleCreate = () => {
     setOpenDialog(true)
+    setMessageAlertClient('');
+    handleResetAlert()
     resetFilters()
   }
   const handleVisitation = () => {
     setOpenModal(true)
+    handleResetAlert()
     resetFilters()
+  }
+
+  const handleResetAlert = () => {
+    setActionError(false);
+    setActionSuccess(false);
+    setMessageAlertClient('');
   }
 
   const renderInputs = [
@@ -124,20 +132,20 @@ export function Filters() {
   ]
 
   const renderButtons = [
-    { text: 'Filtrar', onClick: applyFilters, className: 'bg-indigo-500 hover:bg-indigo-700 text-white' },
-    { text: 'Limpar', onClick: resetFilters, className: 'bg-orange-500 hover:bg-orange-700 text-white' },
-    { text: 'Criar', onClick: handleCreate, className: 'bg-green-500 hover:bg-green-700 text-white' },
-    { text: 'Visitação', onClick: handleVisitation, className: 'bg-purple-500 hover:bg-purple-700 text-white' },
+    { text: 'Filtrar', onClick: applyFilters, className: 'bg-indigo-500 hover:bg-indigo-700 text-white sm:text-base !m-0 sm:!m-2 px-4 w-4/12 sm:w-2/12' },
+    { text: 'Limpar', onClick: resetFilters, className: 'bg-orange-500 hover:bg-orange-700 text-white sm:text-base !m-0 sm:!m-2 px-4 w-4/12 sm:w-2/12' },
+    { text: 'Criar', onClick: handleCreate, className: 'bg-green-500 hover:bg-green-700 text-white sm:text-base !m-0 sm:!m-2 px-4 w-4/12 sm:w-2/12' },
+    { text: 'Visitação', onClick: handleVisitation, className: 'bg-purple-500 hover:bg-purple-700 text-white sm:text-base !m-0 sm:!m-2 px-4 w-4/12 sm:w-2/12' },
   ];
 
   return (
-    <Grid container spacing={2} className='p-6'>
+    <Grid container spacing={2} className='p-3'>
       {renderInputs.map((input, index) => {
         return input.options
           ? <CoordinateSelect key={index} {...input} />
           : <InputComponent key={index} {...input} />
       })}
-      <Grid item xs={12} sm={12} className="flex items-center justify-center space-x-4 mt-2">
+      <Grid item xs={12} sm={12} className="flex items-center justify-center space-x-4 mt-2 gap-1 flex-wrap">
         {renderButtons.map((button, index) => {
           return <ButtonComponent key={index} {...button}>{button.text}</ButtonComponent>
         })}
