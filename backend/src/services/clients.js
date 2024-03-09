@@ -10,6 +10,16 @@ const getClients = async () => {
   }
 };
 
+const getOneClient = async (id) => {
+  try {
+    const result = await client.query('SELECT * FROM clientes WHERE id = $1', [id]);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erro ao consultar o banco de dados', err);
+    return { error: 'Erro ao consultar o banco de dados' };
+  }
+}
+
 const createClient = async (name, email, phone, coordinate_x, coordinate_y) => {
   try {
     const result = await client.query(
@@ -57,5 +67,6 @@ module.exports = {
   getClients,
   createClient,
   updateClient,
-  deleteClient
+  deleteClient,
+  getOneClient
 };
