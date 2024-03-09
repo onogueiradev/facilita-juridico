@@ -80,7 +80,7 @@ export function TableSorted() {
   const [clientDelete, setClientDelete] = useState<DataClient>();
   const [open, setOpen] = useState(false);
 
-  const rows = (newRows.length > 0 ? newRows : rowsInitial)?.map((row) => createData(row.id || 0, row.nome, row.email, row.telefone, row.coordenada_x, row.coordenada_y));
+  const rows = (newRows?.length > 0 ? newRows : rowsInitial)?.map((row) => createData(row.id || 0, row.nome, row.email, row.telefone, row.coordenada_x, row.coordenada_y));
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
@@ -112,7 +112,11 @@ export function TableSorted() {
       await fetchData(`clients/${id}`, 'DELETE');
       setOpen(false);
       const response = await fetchData('clients');
-      setRowsInitial(response);
+      if (response?.message?.includes('Nenhum cliente cadastrado')) {
+        setRowsInitial([]);
+      } else {
+        setRowsInitial(response);
+      }
       setNewRows([]);
       setActionSuccess(true);
       setMessageAlertClient('Cliente excluído com sucesso!');
@@ -182,7 +186,7 @@ export function TableSorted() {
           <Filters />
         </Toolbar>
         {(actionSuccess || actionError) && (
-          <Alert icon={actionError ? <CancelIcon fontSize="inherit" /> : <CheckCircleOutline fontSize="inherit" />} severity={actionError ? 'error' : 'success'} className='flex items-center justify-center text-center text-base'>
+          <Alert icon={actionError ? <CancelIcon fontSize="inherit" /> : <CheckCircleOutline fontSize="inherit" />} severity={actionError ? 'error' : 'success'} className='flex items-center justify-center text-center text-sm sm:text-base'>
             {messageAlertClient}
           </Alert>
         )}
@@ -198,7 +202,7 @@ export function TableSorted() {
               onRequestSort={(e, property) => handleRequestSort(e, property)}
             />
             <TableBody>
-              {visibleRows.map((row, index) => {
+              {visibleRows?.map((row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
                   <TableRow
