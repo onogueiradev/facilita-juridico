@@ -11,7 +11,7 @@ export async function fetchData(endpoint: string = "clients", method: string = "
       },
     };
 
-    if (method === "DELETE" && id) {
+    if (method === "PUT" || method === "DELETE" && id) {
       endpoint += `/${id}`;
     }
 
